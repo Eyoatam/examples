@@ -8,30 +8,22 @@ from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 
 
-# Loss Log
-# with dropout: 0.0227
-# ((W−F+2P)/S)+1
-# (28-5)/1+1 = 24
-# W=input, F=filter size, p=zero-padding, S=stride
-# (20, 24, 24)
-# after pool, (20, 12, 12)
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 40, 5)
+        self.conv1 = nn.Conv2d(1, 32, 3, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(40 * 4 * 4, 100)
-        self.fc2 = nn.Linear(100, 10)
+        self.fc1 = nn.Linear(9216, 128)
+        self.fc2 = nn.Linear(128, 10)
 
     def forward(self, x):
         x = self.conv1(x)
-        x = F.max_pool2d(x, 2)
         x = F.relu(x)
         x = self.conv2(x)
-        x = F.max_pool2d(x, 2)
         x = F.relu(x)
+        x = F.max_pool2d(x, 2)
         x = self.dropout1(x)
         x = torch.flatten(x, 1)
         x = self.fc1(x)
